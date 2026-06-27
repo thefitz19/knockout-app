@@ -128,4 +128,3 @@ createRound("round16", 8, "Last 16", true);
 createRound("qf", 4, "Quarterfinals", true);
 createRound("sf", 2, "Semifinals", true);
 createRound("final", 1, "Final", true);
-
