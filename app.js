@@ -118,7 +118,7 @@ function submitToWhatsApp() {
     message += "%0A";
   });
 
-  const yourNumber = "447XXXXXXXXX"; // Replace with your number
+  const yourNumber = "447728845515"; // Replace with your number
   const url = `https://wa.me/${yourNumber}?text=${message}`;
   window.open(url, "_blank");
 }
