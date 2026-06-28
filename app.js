@@ -6,19 +6,39 @@ const picks = {
   final: Array(1).fill("")
 };
 
-function createRound(id, count, label, disabled = false) {
+const fixtures32 = [
+  ["🇿🇦 South Africa", "🇨🇦 Canada"],
+  ["🇧🇷 Brazil", "🇯🇵 Japan"],
+  ["🇩🇪 Germany", "🇵🇾 Paraguay"],
+  ["🇫🇷 France", "🇸🇪 Sweden"],
+  ["🇳🇱 Netherlands", "🇲🇦 Morocco"],
+  ["🇵🇹 Portugal", "🇭🇷 Croatia"],
+  ["🇪🇸 Spain", "🇦🇹 Austria"],
+  ["🇺🇸 USA", "🇧🇦 Bosnia and Herzegovina"],
+  ["🇧🇪 Belgium", "🇸🇳 Senegal"],
+  ["🇨🇮 Ivory Coast", "🇳🇴 Norway"],
+  ["🇲🇽 Mexico", "🇪🇨 Ecuador"],
+  ["🏴 England", "🇨🇩 DR Congo"],
+  ["🇦🇷 Argentina", "🇨🇻 Cape Verde"],
+  ["🇦🇺 Australia", "🇪🇬 Egypt"],
+  ["🇨🇭 Switzerland", "🇩🇿 Algeria"],
+  ["🇨🇴 Colombia", "🇬🇭 Ghana"]
+];
+
+function createRound(id, fixtures, label, disabled = false) {
   const container = document.getElementById(id);
   container.innerHTML = `<h2>${label}</h2>`;
-  for (let i = 0; i < count; i++) {
+
+  fixtures.forEach((pair, i) => {
     container.innerHTML += `
       <div class="match">
         <select ${disabled ? "disabled" : ""} onchange="updatePick('${id}', ${i}, this.value)">
           <option value="">Select winner</option>
-          <option>Team A</option>
-          <option>Team B</option>
+          <option>${pair[0]}</option>
+          <option>${pair[1]}</option>
         </select>
       </div>`;
-  }
+  });
 }
 
 function unlockRound(roundId) {
@@ -26,27 +46,43 @@ function unlockRound(roundId) {
   for (let s of selects) s.disabled = false;
 }
 
+function autoScrollTo(roundId) {
+  document.getElementById(roundId).scrollIntoView({ behavior: "smooth" });
+}
+
 function updatePick(round, index, value) {
   picks[round][index] = value;
 
   if (round === "round32") {
     updateNext("round32", "round16");
-    if (!picks.round32.includes("")) unlockRound("round16");
+    if (!picks.round32.includes("")) {
+      unlockRound("round16");
+      autoScrollTo("round16");
+    }
   }
 
   if (round === "round16") {
     updateNext("round16", "qf");
-    if (!picks.round16.includes("")) unlockRound("qf");
+    if (!picks.round16.includes("")) {
+      unlockRound("qf");
+      autoScrollTo("qf");
+    }
   }
 
   if (round === "qf") {
     updateNext("qf", "sf");
-    if (!picks.qf.includes("")) unlockRound("sf");
+    if (!picks.qf.includes("")) {
+      unlockRound("sf");
+      autoScrollTo("sf");
+    }
   }
 
   if (round === "sf") {
     updateNext("sf", "final");
-    if (!picks.sf.includes("")) unlockRound("final");
+    if (!picks.sf.includes("")) {
+      unlockRound("final");
+      autoScrollTo("final");
+    }
   }
 }
 
@@ -64,6 +100,11 @@ function updateNext(current, next) {
 }
 
 function validateAllPicks() {
+  if (!document.getElementById("playerName").value.trim()) {
+    alert("Please enter your name.");
+    return false;
+  }
+
   for (const round in picks) {
     if (picks[round].some(p => p === "")) {
       alert("You must complete all picks before submitting.");
@@ -76,11 +117,12 @@ function validateAllPicks() {
 function exportCSV() {
   if (!validateAllPicks()) return;
 
-  let csv = "Round,Match,Pick\n";
+  let csv = "Name,Round,Match,Pick\n";
+  const name = document.getElementById("playerName").value;
 
   Object.keys(picks).forEach(round => {
     picks[round].forEach((pick, i) => {
-      csv += `${round},${i+1},${pick}\n`;
+      csv += `${name},${round},${i+1},${pick}\n`;
     });
   });
 
@@ -96,7 +138,8 @@ function exportCSV() {
 function submitToWhatsApp() {
   if (!validateAllPicks()) return;
 
-  let message = "🏆 *My Knockout Picks*%0A%0A";
+  const name = document.getElementById("playerName").value;
+  let message = `🏆 *Knockout Picks*%0A👤 Player: ${name}%0A%0A`;
 
   const roundLabels = {
     round32: "LAST 32",
@@ -118,13 +161,13 @@ function submitToWhatsApp() {
     message += "%0A";
   });
 
-  const yourNumber = "447728845515"; // Replace with your number
+  const yourNumber = "447728845515"; // <-- Replace with your number
   const url = `https://wa.me/${yourNumber}?text=${message}`;
   window.open(url, "_blank");
 }
 
-createRound("round32", 16, "Last 32", false);
-createRound("round16", 8, "Last 16", true);
-createRound("qf", 4, "Quarterfinals", true);
-createRound("sf", 2, "Semifinals", true);
-createRound("final", 1, "Final", true);
+createRound("round32", fixtures32, "Last 32", false);
+createRound("round16", Array(8).fill(["", ""]), "Last 16", true);
+createRound("qf", Array(4).fill(["", ""]), "Quarterfinals", true);
+createRound("sf", Array(2).fill(["", ""]), "Semifinals", true);
+createRound("final", Array(1).fill(["", ""]), "Final", true);
