@@ -6,16 +6,17 @@ const picks = {
   final: Array(1).fill("")
 };
 
+// CORRECT BRACKET ORDER + FLAGS
 const fixtures32 = [
-  ["🇿🇦 South Africa", "🇨🇦 Canada"],
-  ["🇧🇷 Brazil", "🇯🇵 Japan"],
   ["🇩🇪 Germany", "🇵🇾 Paraguay"],
   ["🇫🇷 France", "🇸🇪 Sweden"],
+  ["🇿🇦 South Africa", "🇨🇦 Canada"],
   ["🇳🇱 Netherlands", "🇲🇦 Morocco"],
   ["🇵🇹 Portugal", "🇭🇷 Croatia"],
   ["🇪🇸 Spain", "🇦🇹 Austria"],
   ["🇺🇸 USA", "🇧🇦 Bosnia and Herzegovina"],
   ["🇧🇪 Belgium", "🇸🇳 Senegal"],
+  ["🇧🇷 Brazil", "🇯🇵 Japan"],
   ["🇨🇮 Ivory Coast", "🇳🇴 Norway"],
   ["🇲🇽 Mexico", "🇪🇨 Ecuador"],
   ["🏴 England", "🇨🇩 DR Congo"],
@@ -93,8 +94,8 @@ function updateNext(current, next) {
   for (let i = 0; i < nextRound.length; i++) {
     nextRound[i].innerHTML = `
       <option value="">Select winner</option>
-      <option>${winners[i*2] || ""}</option>
-      <option>${winners[i*2+1] || ""}</option>
+      <option>${winners[i * 2] || ""}</option>
+      <option>${winners[i * 2 + 1] || ""}</option>
     `;
   }
 }
@@ -122,7 +123,7 @@ function exportCSV() {
 
   Object.keys(picks).forEach(round => {
     picks[round].forEach((pick, i) => {
-      csv += `${name},${round},${i+1},${pick}\n`;
+      csv += `${name},${round},${i + 1},${pick}\n`;
     });
   });
 
@@ -155,17 +156,18 @@ function submitToWhatsApp() {
       if (round === "final") {
         message += `Winner: ${pick}%0A`;
       } else {
-        message += `${i+1}. ${pick}%0A`;
+        message += `${i + 1}. ${pick}%0A`;
       }
     });
     message += "%0A";
   });
 
-  const yourNumber = "447728845515"; // <-- Replace with your number
+  const yourNumber = "447XXXXXXXXX"; // Replace with your number
   const url = `https://wa.me/${yourNumber}?text=${message}`;
   window.open(url, "_blank");
 }
 
+// BUILD ROUNDS
 createRound("round32", fixtures32, "Last 32", false);
 createRound("round16", Array(8).fill(["", ""]), "Last 16", true);
 createRound("qf", Array(4).fill(["", ""]), "Quarterfinals", true);
